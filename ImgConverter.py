@@ -3,48 +3,85 @@ from PIL import Image, ImageTk
 import os
 import tkinter as tk
 from tkinter import filedialog as fd
+import stat
+
+# TODO:
+# - Fix up UI
+#   - Add box to tell user the status of the program
+#   - Move image to the right?
+#   - Make it look good
+# - Skip over files that are not images (currently errors on non-image files)
+# - Counter for files checked out of total files (i.e. 24/45)
+# - Clean up files, split where necessary
+
 
 window = tk.Tk()
 window.title("Image Converter")
 window.geometry("650x850+550+100")
 
-def convert_pictures(folder, canvas):
+def show_image(img, canvas):
+
+    # Getting into canvas stuff for image preview at the bottom
+    # Get the newly saved image, resize it for preview
+    resized_img = img.resize((400, 350))
+    # Declare temp as global, otherwise garbage collection removes the image before it can be displayed
+    # Convert to PhotoImage for canvas to use
+    global temp
+    temp = ImageTk.PhotoImage(resized_img)
+    # Place image at 0,0, update canvas to display. Convert the resized image into a PhotoImage
+    canvas.create_image(0,0,anchor=tk.NW, image=temp)
+    canvas.update()
+
+def convert_images(folder, canvas):
     count = 0
-    print("Folder: ", folder)
     try:
         # Run through each file in directory
         for filename in os.listdir(folder):
+            
+            # Initialize the image
             img = Image.open(folder + filename)
-            resized_img = img.resize((400,350), Image.ANTIALIAS)
-            temp_img = ImageTk.PhotoImage(resized_img)
-            canvas.create_image(0, 0, anchor=tk.NW, image=temp_img)
-            canvas.update()
-            # Get the file type of the current file
-            # We get the last five characters of the file to see if it is a .webp
+
+            # Get the last 5 characters of the filename, check if its a .webp file
             file_type = filename[len(filename)-5:len(filename)]
-            # Create variable to hold full path of file, minus the extension
-            temp = folder + filename[0:len(filename)-4]
-            # Finally, check that file type is .webp, and make sure it doesn't already exist as a .png
-            if file_type == ".webp" and not os.path.exists(temp+".png"):
-                # Open image, re-save it with the
-                
-                temp = folder + filename[0:len(filename)-4]
-                print("Saving", filename, " as: ", temp+".png")
-                # Add new file extension to image
-                img.save(temp + ".png")
-                # Remove old .webp from the folder
-                print("Removing: ", folder+filename)
-                os.remove(folder+filename)
-                count += 1
-                print("Found .webp file. Total: ", count)
-            else:
-                print("Continuing...")
+            if file_type.lower() != ".webp":
+                show_image(img, canvas)
+                print("[~] File", filename, "is not a .webp. Continuing...")
                 continue
 
-    except:
-        print("Failed")
-    print("Finished.")
+            # Create temporary variable to hold the path of the file, minus the .webp characters
+            temp = folder + filename[0:len(filename)-5]
+            #print("Temp:", temp)
+            
+            # Make sure that the image is not already converted into a .png within the folder
+            if os.path.exists(temp + ".png"):
+                show_image(img, canvas)
+                print("[-] File", filename, "is already a .png in designated folder. Removing the .webp...")
+                # Giving program permission to delete files
+                os.chmod(folder+filename, 0o777)
+                os.remove(folder + filename)
+                print("[-] Removed", folder + filename, ". Continuing...")
+                continue
+            
 
+            print("[+] Saving", filename, "as:", temp + ".png")
+            # Resave the image, convert to png
+            img.save(temp + ".png")
+
+            temp_img = Image.open(temp + ".png")
+            show_image(temp_img, canvas)
+            #temp_img = ImageTk.PhotoImage(resized_img)
+            #canvas.create_image(0,0, anchor=tk.NW, image=temp_img)
+
+            # Remove old .webp file from folder (Maybe make this a checkbox option later)
+            print("[-] Removing: ", folder + filename)
+            os.chmod(folder+filename, 0o777)
+            os.remove(folder + filename)
+            
+            count += 1
+            print("Successfully converted .webp. Total:", count)
+    except Exception as e:
+        print(e)
+    print("Finished converting.")
 
 
 label_frame = tk.Frame(master=window, width=75, height=50)
@@ -63,9 +100,6 @@ def get_file(file_path):
     file_path.delete(0, tk.END)
     file_path.insert(0, file+"/")
 
-def convert_images(folder, canvas):
-    convert_pictures(folder, canvas)
-
 
 greeting_label = tk.Label(
     master=label_frame,
@@ -77,7 +111,7 @@ greeting_label = tk.Label(
 
 img_label = tk.Label(
     master=img_frame,
-    image=None,
+    #image=None,
     width=0,
     height=0,
 )
