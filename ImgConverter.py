@@ -37,7 +37,9 @@ def convert_images(folder, canvas):
     try:
         # Run through each file in directory
         for filename in os.listdir(folder):
-            
+            if !filename.lower().endswith(('.png','.jpg','.jpeg')):
+                print("Skipping:", folder+filename)
+                continue
             # Initialize the image
             img = Image.open(folder + filename)
 
@@ -59,7 +61,7 @@ def convert_images(folder, canvas):
                 # Giving program permission to delete files
                 os.chmod(folder+filename, 0o777)
                 os.remove(folder + filename)
-                print("[-] Removed", folder + filename, ". Continuing...")
+                print("[-] Removed .webp", folder + filename, ". Continuing...")
                 continue
             
 
@@ -73,7 +75,7 @@ def convert_images(folder, canvas):
             #canvas.create_image(0,0, anchor=tk.NW, image=temp_img)
 
             # Remove old .webp file from folder (Maybe make this a checkbox option later)
-            print("[-] Removing: ", folder + filename)
+            print("[-] Removing:", folder + filename)
             os.chmod(folder+filename, 0o777)
             os.remove(folder + filename)
             
