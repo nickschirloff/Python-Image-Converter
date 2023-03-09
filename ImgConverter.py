@@ -3,21 +3,32 @@ from PIL import Image, ImageTk
 import os
 import tkinter as tk
 from tkinter import filedialog as fd
-import stat
+import shutil
 
 # TODO:
 # - Fix up UI
 #   - Add box to tell user the status of the program
 #   - Move image to the right?
 #   - Make it look good
-# - Skip over files that are not images (currently errors on non-image files)
+# - Skip over files that are not images (currently errors on non-image files) (Finished, 3/8)
 # - Counter for files checked out of total files (i.e. 24/45)
+# - Create error handling
 # - Clean up files, split where necessary
-
 
 window = tk.Tk()
 window.title("Image Converter")
-window.geometry("650x850+550+100")
+window.geometry("950x850+550+100")
+
+# Globals for settings
+output_folder = os.getcwd() + "/"
+removed_folder = os.getcwd() + "/removed"
+end_type = ".png"
+delete_file = False
+file_count = 0
+command = 0
+# 0 = Whole folder
+# 1 = Single image
+# 2 = Whole directory
 
 def show_image(img, canvas):
 
@@ -32,68 +43,62 @@ def show_image(img, canvas):
     canvas.create_image(0,0,anchor=tk.NW, image=temp)
     canvas.update()
 
-def convert_images(folder, canvas):
-    count = 0
+def convert_img(canvas, path):
+    # Splits path into tuple. [0] = Path, [1] = File
+    # Ex: /Desktop/Images/img.png
+    # [0] = /Desktop/Images, [1] = img.png
+    #print("FULL PATH: ", path)
+    path_tuple = os.path.split(path)
+
+    # Separating the file name and its extension
+    # Ex: [0] = img, [1] = .png
+    filename_tuple = os.path.splitext(path_tuple[1])
+
+    # Ex: /Desktop/Images + img + .jpg
+    converted_path = path_tuple[0] + "/" + filename_tuple[0] + end_type
+
     try:
-        # Run through each file in directory
-        for filename in os.listdir(folder):
-            if !filename.lower().endswith(('.png','.jpg','.jpeg')):
-                print("Skipping:", folder+filename)
-                continue
-            # Initialize the image
-            img = Image.open(folder + filename)
-
-            # Get the last 5 characters of the filename, check if its a .webp file
-            file_type = filename[len(filename)-5:len(filename)]
-            if file_type.lower() != ".webp":
-                show_image(img, canvas)
-                print("[~] File", filename, "is not a .webp. Continuing...")
-                continue
-
-            # Create temporary variable to hold the path of the file, minus the .webp characters
-            temp = folder + filename[0:len(filename)-5]
-            #print("Temp:", temp)
-            
-            # Make sure that the image is not already converted into a .png within the folder
-            if os.path.exists(temp + ".png"):
-                show_image(img, canvas)
-                print("[-] File", filename, "is already a .png in designated folder. Removing the .webp...")
-                # Giving program permission to delete files
-                os.chmod(folder+filename, 0o777)
-                os.remove(folder + filename)
-                print("[-] Removed .webp", folder + filename, ". Continuing...")
-                continue
-            
-
-            print("[+] Saving", filename, "as:", temp + ".png")
-            # Resave the image, convert to png
-            img.save(temp + ".png")
-
-            temp_img = Image.open(temp + ".png")
-            show_image(temp_img, canvas)
-            #temp_img = ImageTk.PhotoImage(resized_img)
-            #canvas.create_image(0,0, anchor=tk.NW, image=temp_img)
-
-            # Remove old .webp file from folder (Maybe make this a checkbox option later)
-            print("[-] Removing:", folder + filename)
-            os.chmod(folder+filename, 0o777)
-            os.remove(folder + filename)
-            
-            count += 1
-            print("Successfully converted .webp. Total:", count)
+        img = Image.open(path)
+        show_image(img, canvas)
     except Exception as e:
-        print(e)
-    print("Finished converting.")
+        #print(e)
+        print("[X] File: ", path_tuple[1], " is not an applicable type to convert. Skipping...")
+        return
+
+    if filename_tuple[1] == end_type:
+        print("[~] Skipping: ", path_tuple[1], ", already in desired type...")
+        return
+    elif os.path.exists(converted_path):
+        print("[~] File: ", path_tuple[1], " already exists in desired type. Moving old file...")
+        os.rename(path, os.getcwd() + "/removed")
+        print("[-] Old file removed. Continuing...")
+        return
+    else:
+        print("[+] Saving ", path_tuple[1], " as: ", end_type)
+        img.save(path + filename_tuple[0] + end_type)
+
+        print("[-] Removing old file: ", path_tuple[1], "...")
+        shutil.move(path, removed_folder)
+        print("[~] Done. Continuing...")
+        return
+
+# Temp function before adding more options for file manipulation
+def temp_run(canvas, folder):
+    for file in os.listdir(folder):
+        convert_img(canvas, folder+"/"+file)
 
 
 label_frame = tk.Frame(master=window, width=75, height=50)
 file_button_frame = tk.Frame(master=window, width=75, height=5)
 file_path_frame = tk.Frame(master=window, width=75, height=5)
+output_text_frame = tk.Frame(master=window, width=75, height=5)
+output_button_frame = tk.Frame(master=window, width=75, height=5)
 run_button_frame = tk.Frame(master=window, width=75, height=5)
 img_frame = tk.Frame(master=window, width=75, height=25)
 canvas_frame = tk.Frame(master=window, width=75, height=25)
 
 entry_text= ""
+output_text = ""
 
 canvas = tk.Canvas(canvas_frame, width=400, height=350)
 
@@ -108,31 +113,40 @@ greeting_label = tk.Label(
     text="Please choose which folder to work in.",
     width=75,
     height=10,
-    bg="white"
+    bg="white",
+    justify="left"
 ).pack()
 
-img_label = tk.Label(
-    master=img_frame,
-    #image=None,
-    width=0,
-    height=0,
+input_folder_button = tk.Button(
+    master=file_button_frame,
+    text="Choose folder...",
+    relief= tk.RAISED,
+    width=75,
+    height=5,
+    command=lambda: get_file(input_file_path)
+    #bg="blue"
 )
 
-file_path = tk.Entry(
+input_file_path = tk.Entry(
     master=file_path_frame,
     width=75,
     textvariable=entry_text
     #height=5
 )
 
-button = tk.Button(
-    master=file_button_frame,
-    text="Choose folder...",
-    relief= tk.RAISED,
+output_folder_button = tk.Button(
+    master=output_button_frame,
+    text="Choose output folder...",
+    relief=tk.RAISED,
     width=75,
     height=5,
-    command=lambda: get_file(file_path)
-    #bg="blue"
+    command=lambda: get_file(output_file_path)
+)
+
+output_file_path = tk.Entry(
+    master=output_text_frame,
+    width=75,
+    textvariable=output_text
 )
 
 run_button = tk.Button(
@@ -141,12 +155,21 @@ run_button = tk.Button(
     relief=tk.RAISED,
     width=75,
     height=5,
-    command=lambda: convert_images(file_path.get(), canvas)
+    command=lambda: temp_run(canvas, input_file_path.get())
 )
 
 
-button.pack()
-file_path.pack()
+img_label = tk.Label(
+    master=img_frame,
+    #image=None,
+    width=0,
+    height=0,
+)
+
+input_folder_button.pack()
+input_file_path.pack()
+output_folder_button.pack()
+output_file_path.pack()
 run_button.pack()
 img_label.pack()
 canvas.pack()
@@ -154,6 +177,8 @@ canvas.pack()
 label_frame.pack(fill=tk.BOTH)
 file_button_frame.pack(fill=tk.BOTH)
 file_path_frame.pack(fill=tk.BOTH)
+output_button_frame.pack(fill=tk.BOTH)
+output_text_frame.pack(fill=tk.BOTH)
 run_button_frame.pack(fill=tk.BOTH)
 img_frame.pack(fill=tk.BOTH)
 canvas_frame.pack(fill=tk.BOTH)
