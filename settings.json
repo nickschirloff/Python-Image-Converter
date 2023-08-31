@@ -1,0 +1,7 @@
+{
+    "output_folder":"output",
+    "removed_folder":"removed",
+    "end_type":".png",
+    "delete_flag":"True",
+    "command":"0"
+}
