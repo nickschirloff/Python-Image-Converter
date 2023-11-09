@@ -1,3 +1,4 @@
+from PyQt6.QtCore import QSize 
 from PyQt6.QtWidgets import (
     QVBoxLayout,
     QLineEdit,
@@ -5,11 +6,10 @@ from PyQt6.QtWidgets import (
     QPushButton,
 )
 
-class LeftPane:
+class SettingsPane:
     def __init__(self):
         self.layout = QVBoxLayout()
         
-
     def create_pane(self):
 
         input_button = QPushButton("Select Input Folder")
@@ -35,6 +35,7 @@ class LeftPane:
 
         widget = QWidget()
         widget.setLayout(self.layout)
+        widget.setFixedSize(QSize(350, 600))
         return widget
 
     

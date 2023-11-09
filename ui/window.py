@@ -1,30 +1,27 @@
-import sys
-
-from ui.left_pane_layout import LeftPane as lp
+from ui.settings_pane import SettingsPane
+from ui.image_pane import ImagePane
 
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtWidgets import (
     QMainWindow,
-    QGridLayout,
+    QHBoxLayout,
     QWidget,
-    QVBoxLayout,
-    QPushButton
 )
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
 
         self.setWindowTitle("Image Converter")
-        
-        self.setFixedSize(QSize(400,600))
+        self.setFixedSize(QSize(950,600))
 
-        left_pane = lp()
-        self.setCentralWidget(left_pane.create_pane())
+        layout = QHBoxLayout()
 
-        # button = QPushButton("Press Me")
-        # button.setCheckable(True)
+        sp = SettingsPane()
+        ip = ImagePane()
 
-        # button.clicked.connect(self.convert_img)
+        layout.addWidget(sp.create_pane())
+        layout.addWidget(ip.create_pane())
 
-    def convert_img(self, checked):
-        print("Clicked", checked)
+        widget = QWidget()
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
