@@ -11,7 +11,7 @@ class ConvertedImage:
         # [0] = img  [1] = .webp
         self.filename_tuple = os.path.splitext(self.path_tuple[1])
 
-    def doConversion(self):
+    def do_conversion(self):
         new_path = self.path_tuple[0] + "/" + self.filename_tuple[1] + self.config.get("end_type")
 
         try:
