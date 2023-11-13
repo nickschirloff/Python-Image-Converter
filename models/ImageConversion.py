@@ -1,55 +1,77 @@
 import os
 import shutil
 from PIL import Image
+from models.Settings import read_settings
 
 class ConvertImage:
     def __init__(self, update_panel):
-        # Load settings here
         self.update_panel = update_panel
         self.file_count = 1
         self.total_file_count = 0
+        self.config = read_settings()
 
     def convert_folder(self, dir):
+        '''
+        Iterates over a folder to attempt to convert image types
+        
+        Parameters:
+        dir (str): The directory to iterate over
+        Returns:
+        none
+        '''
+        if not(os.path.isdir(dir)):
+            print("[*] Error: Input directory does not exist. Please double check that the path is correct")
+            return
+        
         self.total_file_count = len([name for name in os.listdir(dir)])
+        if(self.total_file_count == 0):
+            print("[*] No files in directory specified. Make sure you have the correct directory and try again.")
+            return
+        
         for file in os.listdir(dir):
-            self.convert_image(dir + "/" + file)
+            fp = dir + file
+            self.convert_image(fp)
             self.file_count += 1
-
+        print("Finished.")
+        return
+    
     def convert_image(self, path):
+        '''
+        Convert a singular image into the desired 
+    
+        Parameters:
+        path (str): The path to the image
+        Returns:
+        True: Image was converted successfully
+        False: Image could not be converted
+        '''
         # [0] = /Path/To/Image/  [1] = img.webp
         path_tuple = os.path.split(path)
         # [0] = img  [1] = .webp
         filename_tuple = os.path.splitext(path_tuple[1])
-        # TODO: Convert below line to read from config json
-        new_path = path_tuple[0] + "/" + filename_tuple[0] + ".png"
+        new_path = path_tuple[0] + "/" + filename_tuple[0] + self.config.get("end_type")
 
-        # TODO: Convert below line to read from config json
-        remove_path = os.getcwd() + "/removed"
-        if not(os.path.exists(remove_path)):
-            os.mkdir(remove_path)
+        temp = self.config.get("remove_path")
+        if (temp == "" or temp == "/removed") and not(os.path.exists(os.getcwd() + "/removed")):
+            os.mkdir(os.getcwd() + "/removed")
         
         try: 
             img = Image.open(path)
 
             self.update_panel(path, filename_tuple[0], "%s/%s" % (str(self.file_count), str(self.total_file_count)))
-            # TODO: Convert below line to read from config json
-            if(filename_tuple[1] == ".png"):
+            if(filename_tuple[1] == self.config.get("end_type")):
                 print("[~] File: ", path_tuple[0] + " is already in desired format. Skipping...")
                 return False
             elif(os.path.exists(new_path)):
                 print("[~] File: " + path_tuple[0] + " already exists. Skipping...")
                 return False
             else:
-                # TODO: Convert below line to read from config json
-                print("[+] Converting: " + path_tuple[1] + " to " + ".png" + "...")
+                print("[+] Converting: " + path_tuple[1] + " to " + self.config.get("end_type") + "...")
                 img.save(new_path)
                 print("[>] Done. Continuing...")
                 
-
-            # TODO: Convert below line to read from config json 
-            if("True" == "True"):
+            if(self.config.get("delete_flag") == "True"):
                 print("[-] Removing: " + path_tuple[1] + "...")
-                # TODO: Convert below line to read from config json
                 shutil.move(path, os.getcwd() + "\\removed\\")
                 print("[>] Done. Continuing...")
             
