@@ -1,22 +1,81 @@
-A PyQt app to make mass-converting images from one file type to another.
 
-Inspired by how many services (such as Google Docs) have issues working with the .webp format, which has
-become fairly common. When trying to import many graphs and images within a document, individually
-converting each file can be cumbersome. This program seeks to make that process easier.
+# Python Image Converter
 
-Install dependencies and run main.py
+A PyQt app to make mass-converting images from one file type to another easier.
 
-Program is completely functional, but of course needs testing, please report any bugs encountered.
+Inspired by how many services (such as Google Docs) do not support with the .webp image format, which has become fairly common. This becomes cumbersome when trying to import a lot of graphs or images within a project, as each would need to be individually converted. This program seeks to make that process easier with just a few clicks.
 
-TODO:
-- Move output from console to app
-- Add more controls and options
-- Better UI display
-- Code cleanup & optimizations
+## Features
 
-Plans to be implemented in the future:
-- Converting entire directories
-    i.e.: Convert all images in all folders in imgs
-    /imgs
-        /graphs
-        /photos
+- Image preview
+- Simple to use
+- Cross platform
+- Choose desired image format (Coming Soon)
+
+
+## Running the Program
+
+Clone the project
+
+```bash
+  git clone https://github.com/nickschirloff/Python-Image-Converter
+```
+
+Cd to the project directory
+
+```bash
+  cd Python-Image-Conveter
+```
+
+Install dependencies
+
+```bash
+  pip install -r requirements.txt
+```
+
+Run the Program
+
+```bash
+  python main.py
+```
+
+
+## Roadmap
+
+- [ ]  Move output from console to app
+- [ ]  Add more controls and options
+- [ ]  Better UI display
+- [ ]  Code cleanup & optimizations
+- [ ]  Converting all images within a directory
+
+
+## Contributing
+
+This project is currently ongoing, and contributions are always welcome!
+
+If you have a suggestion to improve this project, please fork it and create a pull request.
+
+
+## License
+
+Distributed under 
+[MIT](https://choosealicense.com/licenses/mit/)
+License.
+
+## Contact
+
+Please reach out with feedback or questions at:
+
+Nick Schirloff - schirloffnick@gmail.com
+
+Project Link: https://github.com/nickschirloff/Python-Image-Converter
+
+
+
+## Acknowledgements
+
+ - [PyQt6 Tutorials](https://www.pythonguis.com/pyqt6-tutorial/)
+-  [Pillow Image Library](https://python-pillow.org/)
+
+
+![Visitor Count](https://profile-counter.glitch.me/{YOUR USER}/count.svg)
