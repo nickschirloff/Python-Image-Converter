@@ -77,5 +77,3 @@ Project Link: https://github.com/nickschirloff/Python-Image-Converter
  - [PyQt6 Tutorials](https://www.pythonguis.com/pyqt6-tutorial/)
 -  [Pillow Image Library](https://python-pillow.org/)
 
-
-![Visitor Count](https://img.shields.io/github/downloads/nickschirloff/Python-Image-Converter/total.svg)
