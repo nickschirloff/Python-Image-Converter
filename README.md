@@ -78,4 +78,4 @@ Project Link: https://github.com/nickschirloff/Python-Image-Converter
 -  [Pillow Image Library](https://python-pillow.org/)
 
 
-![Visitor Count](https://profile-counter.glitch.me/{YOUR USER}/count.svg)
+![Visitor Count](https://img.shields.io/github/downloads/nickschirloff/Python-Image-Converter/total.svg)
