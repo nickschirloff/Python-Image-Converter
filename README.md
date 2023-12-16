@@ -33,6 +33,12 @@ Install dependencies
   pip install -r requirements.txt
 ```
 
+Install PyQt
+
+```bash
+  pip install PyQt6
+```
+
 Run the Program
 
 ```bash
