@@ -1,5 +1,5 @@
 
-# Python Image Converter
+# Feather Image Converter
 
 A PyQt app to make mass-converting images from one file type to another easier.
 
@@ -7,24 +7,30 @@ Inspired by how many services (such as Google Docs) do not support with the .web
 
 ## Features
 
-- Image preview
+- Live image preview
 - Simple to use
 - Cross platform
 - Choose desired image format (Coming Soon)
-
 
 ## Running the Program
 
 Clone the project
 
 ```bash
-  git clone https://github.com/nickschirloff/Python-Image-Converter
+  git clone https://github.com/nickschirloff/feather-image-converter
 ```
 
-Cd to the project directory
+Switch to new directory
 
 ```bash
   cd Python-Image-Conveter
+```
+
+Create & run venv
+
+```bash
+  python -m venv ./venv/
+  ./venv/Scripts/activate
 ```
 
 Install dependencies
@@ -33,16 +39,10 @@ Install dependencies
   pip install -r requirements.txt
 ```
 
-Install PyQt
+Run the Program, or the .exe
 
 ```bash
-  pip install PyQt6
-```
-
-Run the Program
-
-```bash
-  python main.py
+  python feather.py
 ```
 
 
@@ -75,7 +75,6 @@ Please reach out with feedback or questions at:
 Nick Schirloff - schirloffnick@gmail.com
 
 Project Link: https://github.com/nickschirloff/Python-Image-Converter
-
 
 
 ## Acknowledgements
